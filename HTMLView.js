@@ -1,12 +1,18 @@
-import React, {PureComponent} from 'react';
-import PropTypes from 'prop-types';
-import htmlToElement from './htmlToElement';
-import {Linking, Platform, StyleSheet, View, ViewPropTypes} from 'react-native';
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
+import htmlToElement from './htmlToElement'
+import {
+  Linking,
+  Platform,
+  StyleSheet,
+  View,
+  ViewPropTypes,
+} from 'react-native'
 
-const boldStyle = {fontWeight: '500'};
-const italicStyle = {fontStyle: 'italic'};
-const underlineStyle = {textDecorationLine: 'underline'};
-const codeStyle = {fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace'};
+const boldStyle = { fontWeight: '500' }
+const italicStyle = { fontStyle: 'italic' }
+const underlineStyle = { textDecorationLine: 'underline' }
+const codeStyle = { fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }
 
 const baseStyles = StyleSheet.create({
   b: boldStyle,
@@ -20,13 +26,13 @@ const baseStyles = StyleSheet.create({
     fontWeight: '500',
     color: '#007AFF',
   },
-  h1: {fontWeight: '500', fontSize: 36},
-  h2: {fontWeight: '500', fontSize: 30},
-  h3: {fontWeight: '500', fontSize: 24},
-  h4: {fontWeight: '500', fontSize: 18},
-  h5: {fontWeight: '500', fontSize: 14},
-  h6: {fontWeight: '500', fontSize: 12},
-});
+  h1: { fontWeight: '500', fontSize: 36 },
+  h2: { fontWeight: '500', fontSize: 30 },
+  h3: { fontWeight: '500', fontSize: 24 },
+  h4: { fontWeight: '500', fontSize: 18 },
+  h5: { fontWeight: '500', fontSize: 14 },
+  h6: { fontWeight: '500', fontSize: 12 },
+})
 
 const htmlToElementOptKeys = [
   'lineBreak',
@@ -36,29 +42,32 @@ const htmlToElementOptKeys = [
   'textComponentProps',
   'NodeComponent',
   'nodeComponentProps',
-];
+]
 
 class HtmlView extends PureComponent {
   constructor() {
-    super();
+    super()
     this.state = {
       element: null,
-    };
+    }
   }
 
   componentDidMount() {
-    this.mounted = true;
-    this.startHtmlRender(this.props.value);
+    this.mounted = true
+    this.startHtmlRender(this.props.value)
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value || this.props.stylesheet !== nextProps.stylesheet) {
-      this.startHtmlRender(nextProps.value, nextProps.stylesheet);
+    if (
+      this.props.value !== nextProps.value ||
+      this.props.stylesheet !== nextProps.stylesheet
+    ) {
+      this.startHtmlRender(nextProps.value, nextProps.stylesheet)
     }
   }
 
   componentWillUnmount() {
-    this.mounted = false;
+    this.mounted = false
   }
 
   startHtmlRender(value, style) {
@@ -69,56 +78,48 @@ class HtmlView extends PureComponent {
       stylesheet,
       renderNode,
       onError,
-    } = this.props;
+    } = this.props
 
     if (!value) {
-      this.setState({element: null});
+      this.setState({ element: null })
     }
 
     const opts = {
       addLineBreaks,
       linkHandler: onLinkPress,
       linkLongPressHandler: onLinkLongPress,
-      styles: {...baseStyles, ...stylesheet, ...style},
+      styles: { ...baseStyles, ...stylesheet, ...style },
       customRenderer: renderNode,
-    };
+    }
 
     htmlToElementOptKeys.forEach(key => {
       if (typeof this.props[key] !== 'undefined') {
-        opts[key] = this.props[key];
+        opts[key] = this.props[key]
       }
-    });
+    })
 
     htmlToElement(value, opts, (err, element) => {
       if (err) {
-        onError(err);
+        onError(err)
       }
 
       if (this.mounted) {
-        this.setState({element});
+        this.setState({ element })
       }
-    });
+    })
   }
 
   render() {
-    const {RootComponent, style} = this.props;
-    const {element} = this.state;
+    const { RootComponent, style } = this.props
+    const { element } = this.state
     if (element) {
       return (
-        <RootComponent
-          {...this.props.rootComponentProps}
-          style={style}
-        >
+        <RootComponent {...this.props.rootComponentProps} style={style}>
           {element}
         </RootComponent>
-      );
+      )
     }
-    return (
-      <RootComponent
-        {...this.props.rootComponentProps}
-        style={style}
-      />
-    );
+    return <RootComponent {...this.props.rootComponentProps} style={style} />
   }
 }
 
@@ -140,7 +141,7 @@ HtmlView.propTypes = {
   TextComponent: PropTypes.func,
   textComponentProps: PropTypes.object,
   value: PropTypes.string,
-};
+}
 
 HtmlView.defaultProps = {
   addLineBreaks: true,
@@ -148,6 +149,6 @@ HtmlView.defaultProps = {
   onLinkLongPress: null,
   onError: console.error.bind(console),
   RootComponent: View,
-};
+}
 
-export default HtmlView;
+export default HtmlView
